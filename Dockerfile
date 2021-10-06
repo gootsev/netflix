@@ -14,5 +14,3 @@ RUN pip install poetry
 RUN make .venv; exit 0
 
 ENTRYPOINT poetry run waitress-serve api.app:app
-
-
