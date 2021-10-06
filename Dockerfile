@@ -10,7 +10,7 @@ ENV AWS_REGION="eu-west-1"
 WORKDIR /app/
 COPY ./small-co-api/ /app/
 RUN pip install poetry
-RUN make .venv
+RUN make .venv; exit 0
 
 ENTRYPOINT poetry run waitress-serve api.app:app
 
