@@ -28,7 +28,6 @@ def upload_file(
     # @todo: error handling
     s3 = get_s3_client()
     bucket = s3.Bucket(bucket)
-    bucket.create()
     return bucket.upload_fileobj(
         file,
         path.join(prefix, filename),
