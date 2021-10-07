@@ -3,6 +3,9 @@ pipeline {
     registry = "gootsev/netflix"
     registryCredential = 'dockerhub'
     dockerImage = ''
+    MAX_INSTANCES=2
+    BUCKET="gootsev-netflix"
+    AWS_DEFAULT_REGION="eu-west-1"
   }
   agent any
   stages {    
@@ -27,5 +30,14 @@ pipeline {
         sh "docker rmi $registry:$GIT_COMMIT"
       }
     }
+    stage ('Deploy AWS') {
+            steps{
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                    sh '''
+                        aws cloudformation update-stack --stack-name mytemplate --template-url https://gootsev-bucket.s3.eu-west-1.amazonaws.com/template10.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET
+                    '''
+                }
+            }
+        }
   }
 }
