@@ -6,6 +6,7 @@ pipeline {
     MAX_INSTANCES=2
     BUCKET="gootsev-next-netflix"
     AWS_DEFAULT_REGION="eu-west-1"
+    STACK_NAME="mynetflix"
   }
   agent any
   stages {    
@@ -33,13 +34,9 @@ pipeline {
     stage ('Deploy AWS') {
             steps{
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
-                    script {
-                        if (aws cloudformation describe-stacks --stack-name mytemplate --region us-west-1 &>/dev/null ) {
-                          aws cloudformation update-stack --stack-name mytemplate --template-body file://infrastructure.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET --capabilities CAPABILITY_IAM
-                        } else {
-                          aws cloudformation create-stack --stack-name mytemplate --template-body file://infrastructure.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET --capabilities CAPABILITY_IAM
-                        }
-                    }
+                    sh '''
+                        aws cloudformation update-stack --stack-name $STACK_NAME --template-body file://infrastructure.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET --capabilities CAPABILITY_IAM
+                    '''
                 }
             }
         }
