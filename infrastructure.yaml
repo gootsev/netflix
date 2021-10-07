@@ -1,14 +1,11 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: >-
   AWS CloudFormation Template AutoScalingMultiAZWithNotifications: Create
-  a multi-az, load balanced and Auto Scaled sample web site running on an Apache
-  Web Serever. The application is configured to span all Availability Zones in
+  a multi-az, load balanced and Auto Scaled app with API.
+  The application is configured to span all Availability Zones in
   the region and is Auto-Scaled based on the CPU utilization of the web servers.
   Notifications will be sent to the operator email address on scaling events.
-  The instances are load balanced with a simple health check against the default
-  web page. **WARNING** This template creates one or more Amazon EC2 instances
-  and an Application Load Balancer. You will be billed for the AWS resources
-  used if you create a stack from this template.
+  The instances are load balanced with a simple health check.
 Parameters:
   DockerContainerTag:
     Description: Enter the tag of docker container. The tag "latest" is used by default
@@ -215,6 +212,7 @@ Resources:
       SecurityGroups:
         - !Ref InstanceSecurityGroup
       InstanceType: t2.micro
+      IamInstanceProfile: !Ref NetflixInstanceProfile
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
@@ -334,6 +332,40 @@ Resources:
       Tags:
         - Key: Name
           Value: gootsev-next-netflix
+  NetflixRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      Path: /
+      Policies:
+        - PolicyName: netflix_s3
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "s3:PutObject"
+                  - "s3:GetObject"
+                  - "s3:DeleteObject"
+                Resource: !Join
+                  - ''
+                  - - 'arn:aws:s3:::'
+                    - !Ref S3Bucket
+                    - '/*'
+  NetflixInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Path: /
+      Roles:
+        - !Ref NetflixRole
 Outputs:
   URL:
     Description: The URL of the website
