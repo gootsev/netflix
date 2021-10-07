@@ -34,7 +34,7 @@ pipeline {
             steps{
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
-                        aws cloudformation update-stack --stack-name mytemplate --template-url https://gootsev-bucket.s3.eu-west-1.amazonaws.com/template10.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET
+                        aws cloudformation update-stack --stack-name mytemplate --template-url https://gootsev-bucket.s3.eu-west-1.amazonaws.com/template10.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET --capabilities CAPABILITY_IAM
                     '''
                 }
             }
