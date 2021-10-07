@@ -15,6 +15,10 @@ Parameters:
     Description: Maximum instances used by application
     Type: String
     Default: 1
+  BucketName:
+    Description: The name of the bucket you are going to use
+    Type: String
+    Default: gootsev-next-netflix
 
 
 Resources:
@@ -220,7 +224,7 @@ Resources:
           yum update -y aws-cli
           /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
           /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerGroup --region ${AWS::Region}
-          docker run -d -p 80:8080 gootsev/netflix:${DockerContainerTag}
+          docker run -d -e S3_BUCKET=${BucketName} -p 80:8080 gootsev/netflix:${DockerContainerTag}
 
   WebServerScaleUpPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
@@ -328,7 +332,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: gootsev-next-netflix
+      BucketName: !Ref BucketName
       Tags:
         - Key: Name
           Value: gootsev-next-netflix
