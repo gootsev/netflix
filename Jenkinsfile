@@ -4,7 +4,7 @@ pipeline {
     registryCredential = 'dockerhub'
     dockerImage = ''
     MAX_INSTANCES=2
-    BUCKET="gootsev-netflix"
+    BUCKET="gootsev-next-netflix"
     AWS_DEFAULT_REGION="eu-west-1"
   }
   agent any
