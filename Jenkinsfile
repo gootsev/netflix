@@ -5,7 +5,7 @@ pipeline {
     }
     stages {
         stage ('Build') {
-            steps{
+            steps {
                 sh 'docker build -t gootsev/netflix:$GIT_COMMIT .'
                 }
             }
