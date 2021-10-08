@@ -35,7 +35,7 @@ pipeline {
             steps{
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY')]) {
                     sh '''
-                        aws cloudformation create-stack --stack-name $STACK_NAME --template-body file://infrastructure.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET --capabilities CAPABILITY_IAM
+                        aws cloudformation update-stack --stack-name $STACK_NAME --template-body file://infrastructure.yaml --parameters ParameterKey=MaxInstances,ParameterValue=$MAX_INSTANCES ParameterKey=DockerContainerTag,ParameterValue=$GIT_COMMIT ParameterKey=BucketName,ParameterValue=$BUCKET --capabilities CAPABILITY_IAM
                     '''
                 }
             }
